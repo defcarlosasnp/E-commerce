@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mundo Lider</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0071ce;
+            --dark: #041e42;
+            --green: #2ecc71;
+            --bg: #f9f9f9;
+            --text: #333;
+        }
+
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: 'Roboto', sans-serif; background-color: var(--bg); color: var(--text); display: flex; flex-direction: column; min-height: 100vh; }
+
+        header { background-color: var(--primary); padding: 12px 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .header-inner { max-width: 1350px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+        .logo { color: white; font-weight: 900; font-size: 26px; text-decoration: none; display: flex; align-items: center; cursor: pointer; letter-spacing: -1px; }
+        .logo i { color: #ffc220; margin-left: 5px; font-size: 0.8em; }
+        
+        .btn-cat { background: transparent; border: 1px solid transparent; color: white; font-weight: 500; display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 15px; }
+        .btn-cat:hover { background: rgba(255,255,255,0.1); }
+
+        .search-bar { flex: 1; position: relative; max-width: 600px; }
+        .search-input { width: 100%; padding: 10px 40px 10px 20px; border-radius: 25px; border: none; outline: none; font-size: 14px; }
+        .search-btn { position: absolute; right: 5px; top: 3px; background: var(--dark); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+        .header-actions { display: flex; gap: 25px; color: white; font-size: 13px; font-weight: 500; }
+        .action-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; position: relative; }
+        .action-item i { font-size: 20px; margin-bottom: 3px; }
+        .cart-badge { background: #ffc220; color: var(--dark); font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 10px; position: absolute; top: -5px; right: -5px; }
+
+        .nav-bar { background-color: var(--dark); padding: 8px 0; font-size: 13px; font-weight: 500; color: white; }
+        .nav-inner { max-width: 1350px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: flex-end; gap: 25px; align-items: center; }
+        .super-btn { background: var(--green); color: white; padding: 5px 15px; border-radius: 15px; border: none; font-weight: 700; cursor: pointer; }
+
+        .container { max-width: 1350px; margin: 25px auto; padding: 0 20px; display: flex; gap: 30px; flex: 1; align-items: flex-start; }
+
+        .sidebar { width: 260px; flex-shrink: 0; }
+        
+        .top-pills { display: flex; gap: 10px; margin-bottom: 25px; }
+        .pill-btn { 
+            background: #f3f3f3; border: none; padding: 8px 16px; border-radius: 20px; 
+            font-size: 14px; font-weight: 500; color: #333; cursor: pointer; display: flex; align-items: center; gap: 6px;
+        }
+        .pill-btn:hover { background: #e0e0e0; }
+        .pill-btn i { font-size: 10px; color: #666; }
+
+        .filter-section { border-bottom: 1px solid #f0f0f0; }
+        .accordion-header { 
+            padding: 18px 0; font-weight: 700; font-size: 15px; color: #222; 
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer; 
+        }
+        .accordion-header i { font-size: 12px; color: #666; transition: transform 0.2s; }
+        .accordion-header.active i { transform: rotate(180deg); }
+        
+        .accordion-body { display: none; padding-bottom: 15px; }
+        .accordion-body.open { display: block; }
+
+        .filter-opt { display: flex; align-items: center; margin-bottom: 12px; font-size: 14px; color: #4a4a4a; cursor: pointer; }
+        .filter-opt:hover { color: var(--primary); }
+        .filter-opt input { 
+            margin-right: 12px; width: 18px; height: 18px; border: 2px solid #ccc; 
+            border-radius: 50%; appearance: none; cursor: pointer; position: relative; 
+        }
+        .filter-opt input:checked { border-color: var(--primary); background: white; }
+        .filter-opt input:checked::after { 
+            content: ''; position: absolute; top: 3px; left: 3px; width: 8px; height: 8px; 
+            background: var(--primary); border-radius: 50%; 
+        }
+
+        .clean-filters { margin-top: 25px; color: var(--primary); font-size: 14px; font-weight: 500; cursor: pointer; border: none; background: none; padding: 0; }
+        .clean-filters:hover { text-decoration: underline; }
+
+        .content { flex: 1; width: 100%; }
+        .results-header { font-size: 18px; font-weight: 700; margin-bottom: 5px; }
+        .results-sub { font-size: 13px; color: #888; margin-bottom: 20px; }
+        
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 20px; 
+            width: 100%;
+        }
+        @media (max-width: 1200px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+        
+        .card { background: white; border-radius: 8px; overflow: hidden; border: 1px solid white; transition: 0.2s; cursor: pointer; position: relative; display: flex; flex-direction: column; height: 100%; }
+        .card:hover { box-shadow: 0 10px 25px rgba(0,0,0,0.08); border-color: #eee; z-index: 10; }
+        
+        .card-img-container { height: 200px; padding: 20px; display: flex; justify-content: center; align-items: center; position: relative; }
+        .card-img { max-height: 100%; max-width: 100%; object-fit: contain; }
+        .badge { position: absolute; top: 12px; left: 12px; border: 1px solid #d0021b; color: #d0021b; background: white; font-size: 10px; font-weight: bold; padding: 3px 8px; border-radius: 4px; }
+        
+        .card-body { padding: 15px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .price-now { font-size: 20px; font-weight: 700; color: #000; }
+        .price-old { font-size: 11px; text-decoration: line-through; color: #999; margin-left: 6px; }
+        .brand { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #666; margin-top: 5px; }
+        .name { font-size: 13px; color: #333; margin-top: 5px; line-height: 1.4; height: 36px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        
+        .seller-info { font-size: 11px; color: #888; margin-top: 5px; }
+
+        .btn-add { 
+            background: var(--primary); color: white; border: none; padding: 10px 0; 
+            border-radius: 20px; font-weight: 700; font-size: 13px; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; gap: 5px; transition: 0.2s; width: 100%; margin-top: 15px;
+        }
+        .btn-add:hover { background: #005bb5; }
+
+        .modal-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-container { background: white; width: 90%; max-width: 1000px; height: 90vh; border-radius: 8px; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        .modal-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { display: flex; flex: 1; overflow: hidden; }
+        
+        .cart-items-col { flex: 1.2; padding: 25px; overflow-y: auto; border-right: 1px solid #eee; }
+        .cart-item { display: flex; gap: 15px; border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 15px; }
+        
+        .summary-col { flex: 1; background: #fcfcfc; padding: 30px; overflow-y: auto; }
+        
+        .dispatch-block { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 25px; }
+        .block-title { font-weight: 700; font-size: 14px; margin-bottom: 15px; color: #222; }
+        
+        .days-row { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .day-cell { text-align: center; cursor: pointer; opacity: 0.5; transition: 0.2s; }
+        .day-cell.active { opacity: 1; }
+        .day-label { font-size: 12px; font-weight: 700; margin-bottom: 5px; }
+        .day-circle { width: 40px; height: 40px; border-radius: 50%; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 12px; background: white; }
+        .day-cell.active .day-circle { background: var(--primary); color: white; border-color: var(--primary); font-weight: 700; }
+        
+        .time-options { border: 1px solid #eee; border-radius: 8px; overflow: hidden; }
+        .time-row { display: flex; justify-content: space-between; padding: 15px; background: white; border-bottom: 1px solid #eee; cursor: pointer; font-size: 13px; align-items: center; }
+        .time-row:last-child { border-bottom: none; }
+        .time-row:hover { background: #f9f9f9; }
+        .time-row.selected { background: #eef7ff; }
+        .check-circle { width: 18px; height: 18px; border: 2px solid #ccc; border-radius: 50%; margin-right: 10px; display: inline-block; vertical-align: middle; }
+        .time-row.selected .check-circle { border-color: var(--primary); background: var(--primary); box-shadow: inset 0 0 0 3px white; }
+
+        .btn-confirm { width: 100%; background: var(--green); color: white; border: none; padding: 15px; font-weight: 700; font-size: 16px; border-radius: 30px; cursor: pointer; margin-top: 15px; }
+        
+        .toast { visibility: hidden; background: #333; color: white; padding: 12px 24px; border-radius: 30px; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 2000; font-size: 14px; }
+        .toast.show { visibility: visible; animation: fadein 0.5s; }
+        @keyframes fadein { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
+        
+        .product-detail-modal { display: flex; gap: 40px; padding: 30px; }
+        .close-modal-btn { position: absolute; top: 15px; right: 20px; font-size: 30px; color: #333; cursor: pointer; z-index: 10; font-weight: bold; background: white; width: 40px; height: 40px; text-align: center; line-height: 40px; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .close-modal-btn:hover { background: #eee; color: red; }
+
+        footer { background-color: var(--primary); color: white; padding: 40px 0 0 0; margin-top: 50px; font-size: 14px; }
+        .footer-inner { max-width: 1280px; margin: 0 auto; padding: 0 20px; display: grid; grid-template-columns: repeat(4, 1fr) auto; gap: 20px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 40px; }
+        .footer-col h3 { font-size: 16px; font-weight: 700; margin-bottom: 20px; }
+        .footer-col ul { list-style: none; padding: 0; margin: 0; }
+        .footer-col li { margin-bottom: 12px; cursor: pointer; opacity: 0.9; }
+        .footer-col li:hover { text-decoration: underline; opacity: 1; }
+        .social-icons { display: flex; gap: 15px; font-size: 20px; }
+        .social-icons i { cursor: pointer; }
+        .footer-bottom { background-color: var(--primary); padding: 30px 0; text-align: center; }
+        .logos-bar { max-width: 1280px; margin: 0 auto; display: flex; justify-content: center; align-items: center; gap: 30px; flex-wrap: wrap; margin-bottom: 20px; font-weight: 700; font-size: 18px; opacity: 0.9; }
+        .legal-text { font-size: 12px; opacity: 0.8; max-width: 1000px; margin: 0 auto; padding: 0 20px; line-height: 1.5; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-inner">
+            <div class="logo" onclick="location.reload()">
+                <span>Mundo Lider</span> <i class="fas fa-sun"></i>
+            </div>
+            <button class="btn-cat" style="color:white; border:none; background:none; font-weight:500; cursor:pointer">
+                <i class="fas fa-th-large"></i> Categorías
+            </button>
+            <div class="search-bar">
+                <input type="text" class="search-input" id="searchInput" placeholder="Buscar productos...">
+                <button class="search-btn" onclick="aplicarFiltros()"><i class="fas fa-search"></i></button>
+            </div>
+            <div class="header-actions">
+                <div class="action-item">
+                    <i class="far fa-user"></i>
+                    <span>Cuenta</span>
+                </div>
+                <div class="action-item" onclick="abrirCarrito()">
+                    <i class="fas fa-shopping-cart"></i> 
+                    <span class="cart-badge" id="cartCount">0</span>
+                    <span>Carro</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="nav-bar">
+        <div class="nav-inner">
+            <button class="super-btn">Ir a Supermercado</button>
+            <span>Vende con nosotros</span>
+            <span>Tarjeta Lider Bci</span>
+            <span>Mi Club</span>
+            <span>Ayuda</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="top-pills">
+                <button class="pill-btn">Precio <i class="fas fa-chevron-down"></i></button>
+                <button class="pill-btn">Marca <i class="fas fa-chevron-down"></i></button>
+            </div>
+
+            <div class="filter-section">
+                <div class="accordion-header active" onclick="toggleAcc(this)">
+                    Precio <i class="fas fa-chevron-up"></i>
+                </div>
+                <div class="accordion-body open">
+                    <label class="filter-opt"><input type="radio" name="price" value="0-10000" onclick="aplicarFiltros()"> $0 - $10.000</label>
+                    <label class="filter-opt"><input type="radio" name="price" value="10000-30000" onclick="aplicarFiltros()"> $10.000 - $30.000</label>
+                    <label class="filter-opt"><input type="radio" name="price" value="30000-60000" onclick="aplicarFiltros()"> $30.000 - $60.000</label>
+                    <label class="filter-opt"><input type="radio" name="price" value="60000-100000" onclick="aplicarFiltros()"> $60.000 - $100.000</label>
+                    <label class="filter-opt"><input type="radio" name="price" value="100000-999999" onclick="aplicarFiltros()"> $100.000 +</label>
+                </div>
+            </div>
+            
+            <div class="filter-section">
+                <div class="accordion-header active" onclick="toggleAcc(this)">
+                    Vendido por <i class="fas fa-chevron-up"></i>
+                </div>
+                <div class="accordion-body open">
+                    <label class="filter-opt"><input type="radio" name="seller" value="Lider" onclick="aplicarFiltros()"> Lider</label>
+                    <label class="filter-opt"><input type="radio" name="seller" value="Partner" onclick="aplicarFiltros()"> Partner</label>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <div class="accordion-header active" onclick="toggleAcc(this)">
+                    Marca <i class="fas fa-chevron-up"></i>
+                </div>
+                <div class="accordion-body open">
+                    <label class="filter-opt"><input type="radio" name="brand" value="" checked onclick="aplicarFiltros()"> Todas</label>
+                    <label class="filter-opt"><input type="radio" name="brand" value="ModaYa" onclick="aplicarFiltros()"> ModaYa</label>
+                    <label class="filter-opt"><input type="radio" name="brand" value="HomeBrew" onclick="aplicarFiltros()"> HomeBrew</label>
+                    <label class="filter-opt"><input type="radio" name="brand" value="SportCo" onclick="aplicarFiltros()"> SportCo</label>
+                    <label class="filter-opt"><input type="radio" name="brand" value="SoundMax" onclick="aplicarFiltros()"> SoundMax</label>
+                    <label class="filter-opt"><input type="radio" name="brand" value="UrbanPack" onclick="aplicarFiltros()"> UrbanPack</label>
+                    <label class="filter-opt"><input type="radio" name="brand" value="TimeTech" onclick="aplicarFiltros()"> TimeTech</label>
+                    <label class="filter-opt"><input type="radio" name="brand" value="LightIt" onclick="aplicarFiltros()"> LightIt</label>
+                    <label class="filter-opt"><input type="radio" name="brand" value="CookWell" onclick="aplicarFiltros()"> CookWell</label>
+                    <label class="filter-opt"><input type="radio" name="brand" value="BasicWear" onclick="aplicarFiltros()"> BasicWear</label>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <div class="accordion-header active" onclick="toggleAcc(this)">
+                    Categoría <i class="fas fa-chevron-up"></i>
+                </div>
+                <div class="accordion-body open">
+                    <label class="filter-opt"><input type="radio" name="category" value="" checked onclick="aplicarFiltros()"> Ver Todo</label>
+                    <label class="filter-opt"><input type="radio" name="category" value="Ropa" onclick="aplicarFiltros()"> Ropa</label>
+                    <label class="filter-opt"><input type="radio" name="category" value="Calzado" onclick="aplicarFiltros()"> Calzado</label>
+                    <label class="filter-opt"><input type="radio" name="category" value="Hogar" onclick="aplicarFiltros()"> Hogar</label>
+                    <label class="filter-opt"><input type="radio" name="category" value="Electrónica" onclick="aplicarFiltros()"> Electrónica</label>
+                    <label class="filter-opt"><input type="radio" name="category" value="Accesorios" onclick="aplicarFiltros()"> Accesorios</label>
+                </div>
+            </div>
+
+            <button class="clean-filters" onclick="limpiarFiltros()">Limpiar filtros</button>
+        </aside>
+
+        <main class="content">
+            <h2 class="results-header">Resultados</h2>
+            <div class="results-sub" id="resultCountText">Cargando...</div>
+            <div class="grid" id="grid"></div>
+        </main>
+    </div>
+
+    <footer>
+        <div class="footer-inner">
+            <div class="footer-col">
+                <h3>¿Necesitas ayuda?</h3>
+                <ul>
+                    <li>Centro de ayuda</li>
+                    <li>Preguntas frecuentes</li>
+                    <li>Servicio técnico</li>
+                    <li>Consulta tu boleta</li>
+                    <li>Devolución y cambios</li>
+                    <li>Lider BCI</li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Infórmate</h3>
+                <ul>
+                    <li>Medios de pago</li>
+                    <li>Pago 100% seguro</li>
+                    <li>Beneficios Lider.cl</li>
+                    <li>Tarjeta de regalo</li>
+                    <li>Recetas Lider</li>
+                    <li>ServiFácil</li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Encuéntranos</h3>
+                <ul>
+                    <li>Nuestros locales</li>
+                    <li>Locales con Retiro Pickup</li>
+                    <li>Cobertura supermercado</li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Acerca de Lider</h3>
+                <ul>
+                    <li>Acerca de nosotros</li>
+                    <li>Términos y condiciones</li>
+                    <li>Política de privacidad</li>
+                    <li>Información legal</li>
+                    <li>Trabaja en Lider</li>
+                    <li>Vende con nosotros</li>
+                    <li>Propiedad Intelectual</li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <div class="social-icons">
+                    <i class="fab fa-twitter"></i>
+                    <i class="fab fa-facebook"></i>
+                    <i class="fab fa-youtube"></i>
+                    <i class="fab fa-instagram"></i>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="logos-bar">
+                <span>Walmart Chile</span>
+                <span>Lider</span>
+                <span>Express</span>
+                <span>Central</span>
+                <span>aCuenta</span>
+                <span>Mi Club</span>
+            </div>
+            <div class="legal-text">
+                Lider.cl - Razón Social: Administradora de Supermercados Hiper Limitada, RUT: 76.134.941-4, es administrada y representada por Sermob Limitada, la que a su vez es representada por Eli Senerman. Dirección: Avda. Presidente Eduardo Frei Montalva.
+            </div>
+        </div>
+    </footer>
+
+    <div id="productModal" class="modal-overlay" onclick="closeModalOutside(event, 'productModal')">
+        <div class="modal-container" style="width:800px; height:auto">
+            <div class="close-modal-btn" onclick="document.getElementById('productModal').style.display='none'">&times;</div>
+            <div class="product-detail-modal">
+                <img id="m-img" src="" style="width:50%; object-fit:contain">
+                <div>
+                    <h2 id="m-name" style="margin-top:0"></h2>
+                    <p id="m-desc" style="color:#666; font-size:14px; line-height:1.6"></p>
+                    <div id="m-price" style="font-size:28px; font-weight:bold; margin:20px 0"></div>
+                    <button class="btn-add" style="position:static; width:auto; padding:12px 30px" onclick="agregarDesdeModal()">Agregar al carro</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="cartModal" class="modal-overlay" onclick="closeModalOutside(event, 'cartModal')">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 style="margin:0">Tu Carro de Compras</h2>
+                <span style="font-size:24px; cursor:pointer" onclick="document.getElementById('cartModal').style.display='none'">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="cart-items-col" id="cartList">
+                    <p>Carro vacío</p>
+                </div>
+                
+                <div class="summary-col">
+                    <div class="dispatch-block">
+                        <div class="block-title">Agenda tu despacho</div>
+                        <div class="days-row">
+                            <div class="day-cell active" onclick="selDay(this)"><div class="day-label">Hoy</div><div class="day-circle">30/1</div></div>
+                            <div class="day-cell" onclick="selDay(this)"><div class="day-label">Mañ</div><div class="day-circle">31/1</div></div>
+                            <div class="day-cell" onclick="selDay(this)"><div class="day-label">Sáb</div><div class="day-circle">01/2</div></div>
+                            <div class="day-cell" onclick="selDay(this)"><div class="day-label">Dom</div><div class="day-circle">02/2</div></div>
+                        </div>
+                        <div class="time-options">
+                            <div class="time-row selected" onclick="selTime(this, '09:00 - 13:00')">
+                                <div><span class="check-circle"></span> 09:00 - 13:00</div><b>$3.990</b>
+                            </div>
+                            <div class="time-row" onclick="selTime(this, '14:00 - 18:00')">
+                                <div><span class="check-circle"></span> 14:00 - 18:00</div><b>$3.990</b>
+                            </div>
+                            <div class="time-row" onclick="selTime(this, '19:00 - 21:00')">
+                                <div><span class="check-circle"></span> 19:00 - 21:00</div><b>$3.990</b>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="font-weight:700; font-size:14px; margin-bottom:10px">Resumen</div>
+                    <div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:5px">
+                        <span>Subtotal</span> <span id="subtotalVal">$0</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:5px">
+                        <span>Despacho</span> <span id="shippingVal">$0</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-weight:700; font-size:20px; border-top:1px solid #ddd; padding-top:15px; margin-top:10px">
+                        <span>Total</span> <span id="totalVal">$0</span>
+                    </div>
+
+                    <div style="margin-top:20px">
+                        <label style="font-size:12px; font-weight:700">Medio de Pago</label>
+                        <select id="paymentMethod" style="width:100%; padding:10px; margin-top:5px; border-radius:6px; border:1px solid #ccc" onchange="calcTotal()">
+                            <option value="CREDITO">Tarjeta de Crédito</option>
+                            <option value="DEBITO">Redcompra (-10% OFF)</option>
+                            <option value="EFECTIVO">Efectivo</option>
+                        </select>
+                    </div>
+
+                    <button class="btn-confirm" onclick="confirmar()">Confirmar y Pagar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">Mensaje</div>
+
+    <script>
+        const API_URL = 'http://localhost:9090/api';
+        let cart = [];
+        let curProd = null;
+        let selWindow = "09:00 - 13:00";
+
+        const MANUAL_IMAGES = {
+            "Cafetera": "https://images.unsplash.com/photo-1550966871-3ed3c47e7421?auto=format&fit=crop&w=300&q=80",
+            "Lámpara": "https://images.unsplash.com/photo-1507473888900-52e1adad5474?auto=format&fit=crop&w=300&q=80",
+            "Runner": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=300&q=80",
+            "Camisa": "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=300&q=80",
+            "Auriculares": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=300&q=80",
+            "Mochila": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=300&q=80",
+            "Pantalón": "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=300&q=80",
+            "Smartwatch": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=300&q=80",
+            "Cocina": "https://images.unsplash.com/photo-1584992236310-6edddc08acff?auto=format&fit=crop&w=300&q=80",
+            "Calcetines": "https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?auto=format&fit=crop&w=300&q=80"
+        };
+
+        function getImg(p) {
+            for (const key in MANUAL_IMAGES) {
+                if (p.name.includes(key)) return MANUAL_IMAGES[key];
+            }
+            if (p.imageUrl && !p.imageUrl.includes("placehold") && !p.imageUrl.includes("example")) {
+                return p.imageUrl;
+            }
+            return `https://picsum.photos/seed/${p.id}/300/300`;
+        }
+
+        function closeModalOutside(event, modalId) {
+            if (event.target.id === modalId) {
+                document.getElementById(modalId).style.display = 'none';
+            }
+        }
+
+        function toggleAcc(el) {
+            el.classList.toggle('active');
+            const body = el.nextElementSibling; 
+            if(body && body.classList.contains('accordion-body')) {
+                body.classList.toggle('open');
+            } else {
+                const icon = el.querySelector('i');
+                if(icon) icon.style.transform = el.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
+            }
+        }
+
+        async function aplicarFiltros() {
+            const s = document.getElementById('searchInput').value;
+            const c = document.querySelector('input[name="category"]:checked')?.value || "";
+            const b = document.querySelector('input[name="brand"]:checked')?.value || "";
+            const pRange = document.querySelector('input[name="price"]:checked')?.value || "";
+            const seller = document.querySelector('input[name="seller"]:checked')?.value || "";
+            
+            let url = `${API_URL}/products?size=100`;
+            if(s) url += `&search=${encodeURIComponent(s)}`;
+            if(c) url += `&category=${encodeURIComponent(c)}`;
+            if(b) url += `&brand=${encodeURIComponent(b)}`;
+
+            try {
+                const res = await fetch(url);
+                if(!res.ok) throw new Error("Error");
+                const data = await res.json();
+                let list = data.content ? data.content : (Array.isArray(data) ? data : []);
+                
+                if (pRange) {
+                    const [min, max] = pRange.split('-').map(Number);
+                    list = list.filter(p => p.price >= min && p.price <= max);
+                }
+
+                if (seller) {
+                    list.forEach(p => {
+                        const numericId = parseInt(String(p.id).replace(/\D/g, '')) || 0;
+                        p.seller = (numericId % 2 === 0) ? 'Lider' : 'Partner';
+                    });
+                    list = list.filter(p => p.seller === seller);
+                }
+
+                const total = list.length;
+                render(list, total);
+            } catch(e) { console.error(e); }
+        }
+
+        function render(list, total) {
+            const grid = document.getElementById('grid');
+            document.getElementById('resultCountText').innerText = `${total} resultados`;
+            grid.innerHTML = '';
+            
+            list.forEach(p => {
+                let img = getImg(p);
+                if(!p.seller) {
+                     const numericId = parseInt(String(p.id).replace(/\D/g, '')) || 0;
+                     p.seller = (numericId % 2 === 0) ? 'Lider' : 'Partner';
+                }
+
+                grid.innerHTML += `
+                    <div class="card" onclick="openModal('${p.id}', '${p.name}', '${p.description}', ${p.price}, '${img}')">
+                        <div class="card-img-container">
+                            <div class="badge">Rebaja</div>
+                            <img src="${img}" class="card-img">
+                        </div>
+                        <div class="card-body">
+                            <div>
+                                <div class="brand">${p.brand || 'Genérico'}</div>
+                                <div class="name">${p.name}</div>
+                                <div class="seller-info">Vendido por: ${p.seller}</div>
+                            </div>
+                            <div>
+                                <span class="price-now">$${p.price.toLocaleString('es-CL')}</span>
+                                <span class="price-old">$${Math.round(p.price*1.3).toLocaleString('es-CL')}</span>
+                                <button class="btn-add" onclick="event.stopPropagation(); add('${p.id}', '${p.name}', ${p.price}, '${img}')">
+                                    <i class="fas fa-plus"></i> Agregar
+                                </button>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function add(id, name, price, img) {
+            cart.push({id, name, price, img});
+            document.getElementById('cartCount').innerText = cart.length;
+            toast("Agregado al carro");
+        }
+
+        function openModal(id, name, desc, price, img) {
+            curProd = {id, name, price, img};
+            document.getElementById('m-img').src = img;
+            document.getElementById('m-name').innerText = name;
+            document.getElementById('m-desc').innerText = desc;
+            document.getElementById('m-price').innerText = "$" + price.toLocaleString('es-CL');
+            document.getElementById('productModal').style.display = 'flex';
+        }
+
+        function agregarDesdeModal() {
+            if(curProd) {
+                add(curProd.id, curProd.name, curProd.price, curProd.img);
+                document.getElementById('productModal').style.display = 'none';
+            }
+        }
+
+        function abrirCarrito() {
+            if(cart.length === 0) { toast("Carro vacío"); return; }
+            document.getElementById('cartModal').style.display = 'flex';
+            const list = document.getElementById('cartList');
+            list.innerHTML = '';
+            cart.forEach(i => {
+                list.innerHTML += `
+                    <div class="cart-item">
+                        <img src="${i.img}" width="60" style="border:1px solid #eee; border-radius:4px">
+                        <div>
+                            <div style="font-weight:700; font-size:14px">${i.name}</div>
+                            <div style="color:var(--primary); font-weight:700">$${i.price.toLocaleString('es-CL')}</div>
+                        </div>
+                    </div>`;
+            });
+            calcTotal();
+        }
+
+        function selDay(el) {
+            document.querySelectorAll('.day-cell').forEach(d => d.classList.remove('active'));
+            el.classList.add('active');
+        }
+        function selTime(el, time) {
+            document.querySelectorAll('.time-row').forEach(t => t.classList.remove('selected'));
+            el.classList.add('selected');
+            selWindow = time;
+            calcTotal();
+        }
+
+        async function calcTotal() {
+            const pay = document.getElementById('paymentMethod').value;
+            const ids = cart.map(i => {
+                const n = parseInt(String(i.id).replace(/\D/g, ''));
+                return isNaN(n) ? 1 : n; 
+            });
+
+            try {
+                const res = await fetch(`${API_URL}/checkout/calculate`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ productIds: ids, paymentMethod: pay, deliveryWindow: selWindow })
+                });
+                const bill = await res.json();
+                
+                document.getElementById('subtotalVal').innerText = "$" + bill.subtotal.toLocaleString('es-CL');
+                document.getElementById('shippingVal').innerText = "$" + bill.shippingCost.toLocaleString('es-CL');
+                document.getElementById('totalVal').innerText = "$" + bill.total.toLocaleString('es-CL');
+                
+            } catch(e) { console.error(e); }
+        }
+
+        function confirmar() {
+            toast("Compra realizada");
+            setTimeout(() => location.reload(), 2000);
+        }
+
+        function toast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.className = "toast show";
+            setTimeout(() => t.className = t.className.replace("show", ""), 3000);
+        }
+
+        function limpiarFiltros() {
+            document.querySelectorAll('input[type=radio]').forEach(r => r.checked = false);
+            document.querySelector('input[name=category][value=""]').checked = true;
+            document.querySelector('input[name=brand][value=""]').checked = true;
+            document.getElementById('searchInput').value = '';
+            aplicarFiltros();
+        }
+
+        aplicarFiltros();
+    </script>
+</body>
+</html>
